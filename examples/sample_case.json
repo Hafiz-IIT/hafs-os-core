@@ -1,0 +1,8 @@
+{
+  "agent": "Veyra",
+  "task": "draft low-risk brief",
+  "risk": "low",
+  "required_permission": "draft",
+  "verified_sources": 1,
+  "expected_decision": "ACT"
+}
