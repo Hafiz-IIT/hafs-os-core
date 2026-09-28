@@ -3,6 +3,7 @@ $ErrorActionPreference = "Stop"
 $owner = "Hafiz-IIT"
 
 $repos = @(
+    "Hafiz-IIT",
     "residual-rl-linear-priors",
     "residual-rl-linear-priors-paper",
     "koopman-control-lab",
