@@ -43,3 +43,13 @@ Tests cover missing permission, insufficient evidence, low-risk authorized actio
 
 ## License
 MIT.
+
+## Extended implementation
+
+- `orchestration.py` — task dependency graph, cycle detection and designated approval ledger.
+- `docs/PORTFOLIO_INDEX.md` — canonical public portfolio map.
+- `docs/RECOVERED_RESEARCH_MAP.md` — recovered 35-paper research map with publication boundaries.
+- `docs/RECOVERED_100_PRODUCT_ECOSYSTEM.md` — long-term product vision, explicitly not an implementation claim.
+- `docs/GITHUB_PROFILE_README_DRAFT.md` — staged evidence-based GitHub profile README.
+- `scripts/apply-github-metadata.ps1` — sets descriptions/topics for the 21 public repositories using GitHub CLI.
+- `scripts/create-next-repos.ps1` — creates the next project/paper repository shells.
