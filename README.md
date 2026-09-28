@@ -1,26 +1,15 @@
 # ~haf.s__ OS Core
 
-> **A governance spine for agentic work: tasks, permissions, evidence, risk, authority, and audit.**
+> Governance and task-orchestration spine for ~haf.s__ OS: permissions, evidence requirements, risk tiers, audit and action authority.
 
-The broader ~haf.s__ OS / Personal AI / Life Copilot concept needs a layer that decides not what an agent *can generate*, but what it is *authorized to do*. This repository implements that minimal governance core.
+## Status
+**Reproducible prototype** with executable Python, tests, CI, architecture docs, evaluation criteria, roadmap, and citation metadata.
 
-## Implemented
-- SQLite-backed task state
-- agent permission registry
-- risk levels
-- per-task evidence requirements
-- verified evidence records
-- ACT/ASK/VERIFY/ESCALATE authority gate
-- audit trail
+## Problem
+A multi-agent personal/company AI operating system needs explicit authority boundaries. Agents should not inherit unlimited permission merely because they can generate a plausible action.
 
-## Structure
-- `hafs_os_core.py` — core
-- `tests/` — tests
-- `examples/` — reproducible example
-- `docs/architecture.md` — architecture
-- `docs/research-agenda.md` — experiments + manuscript lineage
-- `STATUS.md` — maturity/claims
-- `CITATION.cff` — citation metadata
+## Architecture
+Task creation → risk classification → permission check → verified-evidence count → ACT / ASK / VERIFY / ESCALATE → persistent audit.
 
 ## Run
 ```bash
@@ -28,14 +17,29 @@ python -m unittest discover -s tests -v
 python hafs_os_core.py
 ```
 
-## Pipeline
-**task → risk + permission → evidence requirement → verified-source count → authority gate → decision → audit**
+## Implemented
+- SQLite task store
+- Agent permission registry
+- Risk levels
+- Evidence records
+- Evidence-count gate
+- ACT / ASK / VERIFY / ESCALATE policy
+- Audit history
+- Tests and CI
 
 ## Research lineage
-This is the smallest implemented core of the long-running Personal AI Copilot / Life OS / ~haf.s__ OS idea: persistent context, modular agents, privacy, action authority, and act/ask/verify/escalate oversight.
+- *Scalable Architectures for Distributed Intelligent Agents*
+- *Human–AI Symbiosis: Toward Next-Generation Consumer Applications*
+- *Modular AI Frameworks for Multi-Vertical Startup Innovation*
 
 ## Evaluation
-Construct task sets across permission/risk/evidence combinations and test whether authority is monotonic with verified evidence while critical tasks remain escalated.
+Tests cover missing permission, insufficient evidence, low-risk authorized action and mandatory critical-risk escalation.
 
-## Maturity
-**Research prototype.** This is not a complete personal operating system, autonomous browser, production multi-agent runtime, or integrated life-management product.
+## Limitations
+- Core governance/state layer only
+- No production multi-agent runtime
+- No external tool credentials
+- No browser/action integrations bundled
+
+## License
+MIT.
