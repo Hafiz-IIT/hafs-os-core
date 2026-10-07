@@ -1,55 +1,57 @@
 # ~haf.s__ OS Core
 
-> Governance and task-orchestration spine for ~haf.s__ OS: permissions, evidence requirements, risk tiers, audit and action authority.
+<p align="center"><strong>An Evidence-Governed Operating Spine for AI Agents</strong><br/><sub>Tasks, permissions, evidence, risk and action authority in one inspectable control layer.</sub></p>
 
-## Status
-**Reproducible prototype** with executable Python, tests, CI, architecture docs, evaluation criteria, roadmap, and citation metadata.
+<p align="center"><img src="https://img.shields.io/badge/status-research%20prototype-blue" alt="Prototype"/> <img src="https://img.shields.io/badge/control-ACT%20%2F%20ASK%20%2F%20VERIFY%20%2F%20ESCALATE-purple" alt="Action governance"/></p>
 
-## Problem
-A multi-agent personal/company AI operating system needs explicit authority boundaries. Agents should not inherit unlimited permission merely because they can generate a plausible action.
+## Core idea
 
-## Architecture
-Task creation → risk classification → permission check → verified-evidence count → ACT / ASK / VERIFY / ESCALATE → persistent audit.
+The long-term `~haf.s__ OS` vision is a personal/company AI operating system. This repository isolates one concrete question:
 
-## Run
-```bash
-python -m unittest discover -s tests -v
-python hafs_os_core.py
+> **How should a multi-agent system decide whether an agent has authority to perform an action?**
+
+```
+Task
+ ↓
+Risk classification
+ ↓
+Permission check
+ ↓
+Evidence requirement
+ ↓
+ACT / ASK / VERIFY / ESCALATE
+ ↓
+Audit
 ```
 
+## Try it
+
+```bash
+python hafs_os_core.py
+python -m unittest discover -s tests -v
+```
+
+The orchestration layer additionally provides dependency-aware task execution and a designated human approval ledger.
+
 ## Implemented
-- SQLite task store
-- Agent permission registry
-- Risk levels
-- Evidence records
-- Evidence-count gate
-- ACT / ASK / VERIFY / ESCALATE policy
-- Audit history
-- Tests and CI
 
-## Research lineage
-- *Scalable Architectures for Distributed Intelligent Agents*
-- *Human–AI Symbiosis: Toward Next-Generation Consumer Applications*
-- *Modular AI Frameworks for Multi-Vertical Startup Innovation*
+- SQLite task persistence
+- agent permission registry
+- risk levels
+- evidence records
+- evidence-count gates
+- ACT / ASK / VERIFY / ESCALATE
+- audit trail
+- task dependency graph
+- cycle detection
+- designated approval ledger
 
-## Evaluation
-Tests cover missing permission, insufficient evidence, low-risk authorized action and mandatory critical-risk escalation.
+## Portfolio role
 
-## Limitations
-- Core governance/state layer only
-- No production multi-agent runtime
-- No external tool credentials
-- No browser/action integrations bundled
+This is the **control spine** connecting several research directions in this portfolio:
 
-## License
-MIT.
+[Agent Evidence Probes](https://github.com/Hafiz-IIT/agent-evidence-probes) · [Memory Governor](https://github.com/Hafiz-IIT/memory-governor) · [Safe RL Action Gate](https://github.com/Hafiz-IIT/safe-rl-action-gate) · [Agency QA Orchestrator](https://github.com/Hafiz-IIT/agency-qa-orchestrator)
 
-## Extended implementation
+## Research boundary
 
-- `orchestration.py` — task dependency graph, cycle detection and designated approval ledger.
-- `docs/PORTFOLIO_INDEX.md` — canonical public portfolio map.
-- `docs/RECOVERED_RESEARCH_MAP.md` — recovered 35-paper research map with publication boundaries.
-- `docs/RECOVERED_100_PRODUCT_ECOSYSTEM.md` — long-term product vision, explicitly not an implementation claim.
-- `docs/GITHUB_PROFILE_README_DRAFT.md` — staged evidence-based GitHub profile README.
-- `scripts/apply-github-metadata.ps1` — sets descriptions/topics for the 21 public repositories using GitHub CLI.
-- `scripts/create-next-repos.ps1` — creates the next project/paper repository shells.
+Prototype only. It is not an autonomous company operating system, production agent platform, or claim of safe general autonomy.
