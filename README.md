@@ -92,3 +92,9 @@ The commercial EXIM work and the AI-safety research are intentionally connected 
 ## Important note
 
 These repositories are research/engineering prototypes. They are not presented as production systems, certified safety mechanisms, deployed government infrastructure, physical scanner hardware, or published scientific results unless explicitly documented as such.
+
+
+## Verification evidence
+
+- [Portfolio Verification Matrix](PORTFOLIO_VERIFICATION_MATRIX.md) — current-head GitHub Actions evidence and precise verification vocabulary.
+- [GitHub Metadata Updater](scripts/apply-github-metadata.ps1) — authenticated GitHub CLI script for repository descriptions/topics, because the connected GitHub API surface does not expose those mutations.
