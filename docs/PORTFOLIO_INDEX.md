@@ -53,11 +53,11 @@ These manuscripts are not submitted, peer-reviewed, or published. Each repositor
 - [underwater-lifi-simulator](https://github.com/Hafiz-IIT/underwater-lifi-simulator)
 
 ## Portfolio structure
-The 31 project repositories are organized around:
+The 33 project repositories are organized around:
 
 **Evidence → provenance → memory → authorization → verification → escalation → domain systems**
 
-The GitHub profile repository is [Hafiz-IIT](https://github.com/Hafiz-IIT/Hafiz-IIT). The three earlier software repositories remain separate and are not folded into the research portfolio.
+The GitHub profile repository is [Hafiz-IIT](https://github.com/Hafiz-IIT/Hafiz-IIT). The account currently contains 34 repositories in total: this profile repository plus 33 project repositories, including three earlier projects retained separately.
 
 ## Evidence rule
 A concept is not an implementation. A synthetic simulation is not a real-world deployment. A manuscript scaffold is not a publication. Every repository should state what is implemented, what has been tested, and what remains future work.
