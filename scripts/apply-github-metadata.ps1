@@ -144,3 +144,18 @@ foreach ($repo in $additionalRepos) {
         gh repo edit $full --add-topic $topic
     }
 }
+
+# Earlier software projects and flagship repository topics
+$legacyRepos = @(
+    @{ Name = "EXIM-AI-Evidence-Gated-Autonomy"; Description = "Reproducible research testbed for evidence-gated autonomy, verification, provenance, and escalation in high-consequence AI workflows."; Topics = @("ai-safety","agentic-ai","verification","provenance","exim") },
+    @{ Name = "Smart-City-Management-Management"; Description = "Software prototype for urban incident records, sensor-style data, API workflows, and map-oriented operational monitoring."; Topics = @("smart-city","urban-operations","python","software-prototype") },
+    @{ Name = "resturant-order-management"; Description = "Full-stack restaurant operations project with a Node.js and Express API, MongoDB persistence, menu and order workflows, and JWT-based admin authentication."; Topics = @("nodejs","express","mongodb","rest-api","software-project") }
+)
+foreach ($repo in $legacyRepos) {
+    $full = "$owner/$($repo.Name)"
+    Write-Host "Updating $full"
+    gh repo edit $full --description $repo.Description
+    foreach ($topic in $repo.Topics) {
+        gh repo edit $full --add-topic $topic
+    }
+}
