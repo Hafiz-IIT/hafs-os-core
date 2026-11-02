@@ -121,3 +121,26 @@ foreach ($repo in $repos) {
 }
 
 Write-Host "Done. Verify with: gh repo list $owner --limit 100"
+
+# Second research-paper and project batch
+$additionalRepos = @(
+    @{ Name = "Hafiz-IIT"; Description = "Research and engineering portfolio covering reliable AI systems, agent governance, EXIM intelligence, control and logistics simulation."; Topics = @("portfolio","artificial-intelligence","ai-safety","research","python") },
+    @{ Name = "residual-rl-linear-priors"; Description = "Scalar residual-control research prototype combining a linear prior, bounded nonlinear correction and deterministic rollouts."; Topics = @("reinforcement-learning","control-systems","robotics","simulation","python") },
+    @{ Name = "residual-rl-linear-priors-paper"; Description = "Manuscript and experiment protocol for residual reinforcement learning with linear statistical priors; research in preparation."; Topics = @("research-paper","reinforcement-learning","robotics","control-theory") },
+    @{ Name = "koopman-control-lab"; Description = "EDMD-style scalar lifted-dynamics laboratory with polynomial dictionaries, ridge fitting and multi-step prediction."; Topics = @("koopman-operator","control-theory","dynamical-systems","simulation","python") },
+    @{ Name = "koopman-control-paper"; Description = "Manuscript and evaluation protocol for Koopman-based linear embeddings for automated-agent control; research in preparation."; Topics = @("research-paper","koopman-operator","control-theory","robotics") },
+    @{ Name = "bayesian-safe-rl-lab"; Description = "Scalar Bayesian uncertainty update and conservative ALLOW/VERIFY/BLOCK action-gating prototype."; Topics = @("bayesian-methods","safe-reinforcement-learning","ai-safety","uncertainty","python") },
+    @{ Name = "bayesian-safe-rl-paper"; Description = "Manuscript and evaluation protocol for Bayesian uncertainty models as priors for safe reinforcement learning."; Topics = @("research-paper","bayesian-methods","safe-reinforcement-learning","robotics") },
+    @{ Name = "hybrid-lqr-rl-control"; Description = "Synthetic scalar hybrid-control simulator combining linear feedback with a bounded nonlinear residual."; Topics = @("lqr","control-systems","reinforcement-learning","robotics","simulation") },
+    @{ Name = "hybrid-lqr-rl-paper"; Description = "Manuscript and experiment protocol for hybrid LQR and learned-residual control architectures; research in preparation."; Topics = @("research-paper","lqr","robotics","control-theory") },
+    @{ Name = "exim-multimodal-cargo-framework-paper"; Description = "Architecture manuscript for evidence-preserving EXIM document intelligence and multimodal cargo discrepancy review."; Topics = @("exim","customs","document-ai","multimodal-ai","research-paper") }
+)
+
+foreach ($repo in $additionalRepos) {
+    $full = "$owner/$($repo.Name)"
+    Write-Host "Updating $full"
+    gh repo edit $full --description $repo.Description
+    foreach ($topic in $repo.Topics) {
+        gh repo edit $full --add-topic $topic
+    }
+}
