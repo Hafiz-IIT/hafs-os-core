@@ -32,7 +32,7 @@ The following repositories now contain a LaTeX manuscript source, verified found
 - [hybrid-lqr-rl-paper](https://github.com/Hafiz-IIT/hybrid-lqr-rl-paper)
 - [exim-multimodal-cargo-framework-paper](https://github.com/Hafiz-IIT/exim-multimodal-cargo-framework-paper)
 
-Latest observed Manuscript Integrity runs for all five repositories completed successfully on 2026-11-02, including the LaTeX compilation step. The latest reference/results-schema updates have triggered a fresh CI pass; the repository run pages are the source of truth for their final status.
+Latest Manuscript Integrity runs for all five repositories completed successfully on 2026-11-02, including LaTeX compilation and JSON validation of the not-run results manifests. The manuscript sources now include verified foundational references and explicit result sections without fabricated findings.
 
 ## Evidence boundaries
 
