@@ -25,14 +25,14 @@ The following repositories now include expanded implementations, deterministic d
 Latest observed GitHub Actions runs for these four repositories completed successfully on 2026-11-02.
 
 ### Manuscript repositories
-The following repositories now contain a LaTeX manuscript source, an experiment protocol, build instructions, publication-status wording, and CI that checks source files and compiles the manuscript:
+The following repositories now contain a LaTeX manuscript source, verified foundational references, an experiment protocol, an explicit results directory with a machine-readable not-run manifest, build instructions, publication-status wording, and CI that validates the results manifest and compiles the manuscript:
 - [residual-rl-linear-priors-paper](https://github.com/Hafiz-IIT/residual-rl-linear-priors-paper)
 - [koopman-control-paper](https://github.com/Hafiz-IIT/koopman-control-paper)
 - [bayesian-safe-rl-paper](https://github.com/Hafiz-IIT/bayesian-safe-rl-paper)
 - [hybrid-lqr-rl-paper](https://github.com/Hafiz-IIT/hybrid-lqr-rl-paper)
 - [exim-multimodal-cargo-framework-paper](https://github.com/Hafiz-IIT/exim-multimodal-cargo-framework-paper)
 
-Latest observed Manuscript Integrity runs for all five repositories completed successfully on 2026-11-02, including the LaTeX compilation step.
+Latest observed Manuscript Integrity runs for all five repositories completed successfully on 2026-11-02, including the LaTeX compilation step. The latest reference/results-schema updates have triggered a fresh CI pass; the repository run pages are the source of truth for their final status.
 
 ## Evidence boundaries
 
