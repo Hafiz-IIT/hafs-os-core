@@ -66,7 +66,7 @@ This is still the portfolio's strongest existing research line because it has a 
 **Policy correctness issue — fix implemented, dataset coverage still pending**
 - The previous `src/core.py` completeness feature checked only whether the declaration existed. That allowed a missing packing list to be treated as complete.
 - The rule is now corrected to require invoice, packing list, and declaration. Regression tests cover missing invoice, missing packing list, and missing declaration; the complete clean case remains allowed.
-- Policy regression tests, benchmark generation, integrity checks, existing-table loading, and LaTeX compilation passed in GitHub Actions: [run 43946598549](https://github.com/Hafiz-IIT/EXIM-AI-Evidence-Gated-Autonomy/actions/runs/43946598549).
+- Policy regression tests, benchmark generation, integrity checks, existing-table loading, and LaTeX compilation passed in GitHub Actions: [run 43946899874](https://github.com/Hafiz-IIT/EXIM-AI-Evidence-Gated-Autonomy/actions/runs/43946899874).
 - The current v0.3 synthetic benchmark still does not systematically include missing-invoice and missing-packing-list cases. The new tests validate policy behaviour, but historical result tables do not measure those cases.
 
 **Required EGA work**
