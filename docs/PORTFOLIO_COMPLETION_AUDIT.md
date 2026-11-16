@@ -63,18 +63,19 @@ This is still the portfolio's strongest existing research line because it has a 
 - `generate_benchmark.py` writes a smaller manifest than the richer committed `data/benchmark/manifest.json`. Running the generator overwrites some of the committed manifest metadata in the working tree.
 - The current CI therefore demonstrates benchmark regeneration, integrity checks, table loading, and LaTeX compilation—not full regeneration of every experimental result.
 
-**Potential policy correctness issue**
-- In `src/core.py`, the `complete` feature checks only whether the declaration exists. It does not require the invoice and packing list to be present as well.
-- The current synthetic missing-evidence family removes the declaration or authorization, but does not systematically test missing invoice and missing packing-list cases.
-- A case with a missing packing list may therefore pass the completeness check if the remaining visible documents and other signals agree. Add explicit regression tests and expand the benchmark before relying on this gate.
+**Policy correctness issue — fix implemented, dataset coverage still pending**
+- The previous `src/core.py` completeness feature checked only whether the declaration existed. That allowed a missing packing list to be treated as complete.
+- The rule is now corrected to require invoice, packing list, and declaration. Regression tests cover missing invoice, missing packing list, and missing declaration; the complete clean case remains allowed.
+- Policy regression tests, benchmark generation, integrity checks, existing-table loading, and LaTeX compilation passed in GitHub Actions: [run 43946598549](https://github.com/Hafiz-IIT/EXIM-AI-Evidence-Gated-Autonomy/actions/runs/43946598549).
+- The current v0.3 synthetic benchmark still does not systematically include missing-invoice and missing-packing-list cases. The new tests validate policy behaviour, but historical result tables do not measure those cases.
 
 **Required EGA work**
 1. Reconstruct and version the missing experiment runners.
 2. Freeze the exact policies, stochastic assumptions, seeds, and cost matrix.
 3. Regenerate all result tables from source, not from the checked-in CSVs.
-4. Make the benchmark generator and committed manifest schema consistent.
-5. Add missing-invoice, missing-packing-list, duplicate-document, and corrupted-provenance cases.
-6. Correct the completeness rule and rerun all experiments under a new benchmark/policy version.
+4. Keep the generator and committed manifest schemas consistent.
+5. Add missing-invoice, missing-packing-list, duplicate-document, and corrupted-provenance cases in a new benchmark version.
+6. Rerun all experiments under the new benchmark/policy version.
 7. Reconcile every paper claim and result table against regenerated outputs.
 
 The current synthetic findings remain synthetic. They do not establish real-world or production safety.
