@@ -159,11 +159,21 @@ The observed negative results are retained: degree-three lifting worsened OOD er
 - Corrected the residual, Koopman, and hybrid LaTeX formatting issues identified in the first audit pass.
 - Corrected the restaurant and Smart City application issues listed above; their latest observed application CI runs passed.
 
+
+### EGA reconstruction v1 execution
+
+- Historical 1B–2E CSVs were added without their original simulation runners or complete parameter configurations; the historical outputs remain preserved and are not represented as reproduced.
+- Added `experiments/reconstruction_v1/PROTOCOL.md`, `scripts/run_reconstruction_v1.py`, and regression tests.
+- The new runner executes 1B, 1C, 1D and 2B–2E under explicit assumptions, 30 Monte Carlo seeds per condition, role-scoped synthetic Ed25519 attestations, trust-root attacks and dual-lineage tests.
+- [Run 43949299526](https://github.com/Hafiz-IIT/EXIM-AI-Evidence-Gated-Autonomy/actions/runs/43949299526) passed tests, benchmark integrity, experiment execution, artifact upload and manuscript compilation. The output manifest records 21,500 signature records and SHA-256 hashes for all generated CSVs.
+- Preliminary results: Evidence Gate ICAR 0.81%/4.95%/13.51% across optimistic/moderate/harsh 1B regimes; moderate Risk Gate 5.30%, so the advantage is small under these assumptions. The current 1D shifts do not increase Evidence Gate ICAR. See the [results review](https://github.com/Hafiz-IIT/EXIM-AI-Evidence-Gated-Autonomy/blob/main/experiments/reconstruction_v1/RESULTS_REVIEW.md).
+- This is new synthetic evidence, not historical reproduction, real-model validation, human-subject research or production security evidence.
+
 ## Research sequence — decision
 
 Do not add more repositories. The current order is:
 
-1. **EGA reproducibility repair remains the highest publication blocker.** The existing result tables cannot all be regenerated from committed experiment-runner source. Reconstruct the runners, fix the incomplete evidence gate, and rerun the benchmark before any EGA submission decision.
+1. **EGA remains the highest publication blocker, but a new reconstruction has now been executed.** The new `reconstruction_v1` protocol runs 1B, 1C, 1D and 2B–2E with explicit assumptions and 30 seeds per Monte Carlo condition; [CI run 43949299526](https://github.com/Hafiz-IIT/EXIM-AI-Evidence-Gated-Autonomy/actions/runs/43949299526) passed tests, benchmark integrity, reconstruction, artifact upload and LaTeX compilation. The output hashes are pinned in [the run manifest](https://github.com/Hafiz-IIT/EXIM-AI-Evidence-Gated-Autonomy/blob/main/results/reconstruction_v1/manifest-43949299526.json). This does not reproduce the historical CSVs: their original runner/parameters were not committed, and Experiment 1A's downstream-resolution implementation is still missing. Next: recover or retire the 1A numerical claims, add missing-document benchmark cases, run parameter sensitivity, strengthen OOD tests, and reconcile all manuscript claims. The new reconstruction also shows only a small Evidence Gate advantage over Risk Gate in the moderate 1B regime and no ICAR degradation under the current 1D shifts; those are important negative findings.
 2. **Koopman is the first new dynamics research line and its v0.1 scalar prediction pilot is complete.** Next run ridge sensitivity, sample-size/coverage sweeps, noisy dynamics, and then decide whether to extend to MPC/control or keep the paper scoped to prediction.
 3. **Residual control next.** Define and solve a valid nominal controller, then implement a genuinely trainable residual policy. Do not call the current fixed residual an RL agent.
 4. **Bayesian uncertainty gating.** Measure calibration, false-allow/false-block trade-offs, prior misspecification, and distribution shift.
