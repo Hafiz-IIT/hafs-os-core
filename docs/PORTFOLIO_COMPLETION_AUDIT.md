@@ -135,19 +135,42 @@ The five new manuscript repositories have successful LaTeX/integrity workflows. 
 - EGA contains reported synthetic results, but the missing experiment runners described above block a full reproducibility claim.
 - None of these five manuscripts should be described as submitted, peer-reviewed, or published.
 
+## Work completed after the first audit pass
+
+### Koopman scalar prediction pilot
+
+The first new controlled experiment was executed in [koopman-control-lab](https://github.com/Hafiz-IIT/koopman-control-lab).
+
+- Updated the lifting dictionary to include the constant observable.
+- Added operator/input validation and tests for affine fitting, lifted rollout, and malformed inputs.
+- Added a fixed-seed experiment runner with five synthetic scalar maps, ten seeds, persistence and affine-linear baselines, and degree-two/degree-three EDMD ablations.
+- Generated 200 per-seed model evaluations, aggregate means/standard deviations/95% t-intervals, and SHA-256 hashes for the generated CSVs.
+- Updated the companion manuscript to report the actual pilot and renamed it to reflect prediction rather than unsupported control claims.
+- Latest observed lab CI run passed and archived the full CSV outputs as the `koopman-scalar-benchmark` artifact.
+
+The pilot is explicitly limited to synthetic scalar prediction. It does not establish Koopman invariance or control/MPC utility. Ridge sensitivity, sample-size/coverage sweeps, noise, higher-dimensional systems, and closed-loop evaluation remain outstanding.
+
+The observed negative results are retained: degree-three lifting worsened OOD error on the tanh system relative to the affine baseline and worsened 20-step error on the piecewise regime-shift system despite improving one-step error.
+
+### Manuscript and application corrections
+
+- Updated the Koopman companion paper's protocol, abstract, results, limitations, reproducibility note, and claims ledger to match the executed pilot.
+- Corrected the residual, Koopman, and hybrid LaTeX formatting issues identified in the first audit pass.
+- Corrected the restaurant and Smart City application issues listed above; their latest observed application CI runs passed.
+
 ## Research sequence — decision
 
-Do not begin by adding more repositories. The order should be:
+Do not add more repositories. The current order is:
 
-1. **Repair EGA reproducibility first.** It is the most mature existing research candidate, but its current result tables cannot all be regenerated from the committed source.
-2. **Start the first new controlled experiment with Koopman lifted dynamics.** It has the clearest bounded prediction task and can be evaluated with persistence and linear-regression baselines, polynomial dictionary ablations, multiple seeds, held-out state ranges, and multi-step error. Decide after results whether to extend it to MPC/control or retitle the manuscript to match a prediction contribution.
-3. **Then residual control.** First define a valid nominal controller and implement a genuinely trainable residual policy; do not call the fixed residual an RL agent.
-4. **Then Bayesian uncertainty gating.** Measure calibration, false-allow/false-block trade-offs, prior misspecification, and distribution shift.
-5. **Then hybrid LQR + RL.** It depends on a valid LQR baseline and trained residual policy, so it should not precede those foundations.
-6. **Only after reproducible evidence:** conduct the novelty review, revise mathematical claims, and decide which manuscript merits arXiv submission.
+1. **EGA reproducibility repair remains the highest publication blocker.** The existing result tables cannot all be regenerated from committed experiment-runner source. Reconstruct the runners, fix the incomplete evidence gate, and rerun the benchmark before any EGA submission decision.
+2. **Koopman is the first new control/robotics research line and its v0.1 scalar prediction pilot is complete.** Next run ridge sensitivity, sample-size/coverage sweeps, noisy dynamics, and then decide whether to extend to MPC/control or keep the paper scoped to prediction.
+3. **Residual control next.** Define and solve a valid nominal controller, then implement a genuinely trainable residual policy. Do not call the current fixed residual an RL agent.
+4. **Bayesian uncertainty gating.** Measure calibration, false-allow/false-block trade-offs, prior misspecification, and distribution shift.
+5. **Hybrid LQR + RL.** It depends on a valid LQR baseline and trained residual policy, so it should not precede those foundations.
+6. **Only after reproducible evidence:** conduct a current literature/novelty review, revise mathematical claims, and decide which manuscript merits arXiv submission.
 
-For every experiment, preserve exact code revision, configuration, seeds, raw per-run outputs, aggregate results, baseline implementations, and negative findings. A result is not complete merely because a workflow passes.
+For every experiment, preserve exact code revision, configuration, seeds, raw per-run outputs, aggregate results, baseline implementations, output hashes, and negative findings. A result is not complete merely because a workflow passes.
 
 ## Metadata status
 
-Repository descriptions have been manually entered by the user. Topics remain optional housekeeping and can be added later in each repository's About panel. No local PowerShell or GitHub CLI installation is required for the remaining topic edits.
+Repository descriptions have been manually entered by the user. Topics remain optional housekeeping and can be added later in each repository's About panel. The connected GitHub tools do not expose a repository topics write operation, so topics still need to be added manually. No local PowerShell or GitHub CLI installation is required.
