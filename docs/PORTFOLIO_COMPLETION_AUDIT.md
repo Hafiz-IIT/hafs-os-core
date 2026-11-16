@@ -164,7 +164,7 @@ The observed negative results are retained: degree-three lifting worsened OOD er
 Do not add more repositories. The current order is:
 
 1. **EGA reproducibility repair remains the highest publication blocker.** The existing result tables cannot all be regenerated from committed experiment-runner source. Reconstruct the runners, fix the incomplete evidence gate, and rerun the benchmark before any EGA submission decision.
-2. **Koopman is the first new control/robotics research line and its v0.1 scalar prediction pilot is complete.** Next run ridge sensitivity, sample-size/coverage sweeps, noisy dynamics, and then decide whether to extend to MPC/control or keep the paper scoped to prediction.
+2. **Koopman is the first new dynamics research line and its v0.1 scalar prediction pilot is complete.** Next run ridge sensitivity, sample-size/coverage sweeps, noisy dynamics, and then decide whether to extend to MPC/control or keep the paper scoped to prediction.
 3. **Residual control next.** Define and solve a valid nominal controller, then implement a genuinely trainable residual policy. Do not call the current fixed residual an RL agent.
 4. **Bayesian uncertainty gating.** Measure calibration, false-allow/false-block trade-offs, prior misspecification, and distribution shift.
 5. **Hybrid LQR + RL.** It depends on a valid LQR baseline and trained residual policy, so it should not precede those foundations.
