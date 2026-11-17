@@ -64,7 +64,6 @@ class HafsOSCore:
             );
             """
         )
-        # Additive migration for databases created by the earlier prototype.
         evidence_columns = {row["name"] for row in self.db.execute("PRAGMA table_info(evidence)")}
         if "verified_by" not in evidence_columns:
             self.db.execute("ALTER TABLE evidence ADD COLUMN verified_by TEXT")
@@ -132,7 +131,33 @@ class HafsOSCore:
             )
             self._audit(row["task_id"], f"evidence-verified:{evidence_id}:by:{verifier}")
 
+    @staticmethod
+    def _maximum_independent_source_verifier_pairs(edges: list[tuple[str, str]]) -> int:
+        """Return the maximum one-to-one matching between evidence sources and verifiers."""
+        adjacency: dict[str, set[str]] = {}
+        for source, verifier in edges:
+            adjacency.setdefault(source, set()).add(verifier)
+
+        verifier_to_source: dict[str, str] = {}
+
+        def augment(source: str, visited: set[str]) -> bool:
+            for verifier in sorted(adjacency[source]):
+                if verifier in visited:
+                    continue
+                visited.add(verifier)
+                previous_source = verifier_to_source.get(verifier)
+                if previous_source is None or augment(previous_source, visited):
+                    verifier_to_source[verifier] = source
+                    return True
+            return False
+
+        for source in sorted(adjacency):
+            augment(source, set())
+        return len(verifier_to_source)
+
     def decide(self, task_id: int, agent: str) -> Decision:
+        if not isinstance(agent, str) or not agent.strip():
+            raise ValueError("acting agent identity is required")
         task = self.db.execute("SELECT * FROM tasks WHERE id=?", (task_id,)).fetchone()
         if task is None:
             raise KeyError(task_id)
@@ -142,16 +167,15 @@ class HafsOSCore:
             (agent, task["required_permission"]),
         ).fetchone() is not None
 
-        evidence_counts = self.db.execute(
-            """SELECT COUNT(DISTINCT source) AS source_count,
-                      COUNT(DISTINCT verified_by) AS verifier_count
-               FROM evidence WHERE task_id=? AND verified=1""",
-            (task_id,),
-        ).fetchone()
-        # A source only counts toward the threshold when it has been verified;
-        # repeated source rows or one verifier's repeated approvals do not
-        # manufacture independent corroboration.
-        verified_count = min(evidence_counts["source_count"], evidence_counts["verifier_count"])
+        evidence_rows = self.db.execute(
+            """SELECT DISTINCT source, verified_by
+               FROM evidence
+               WHERE task_id=? AND verified=1
+                 AND verified_by IS NOT NULL AND verified_by <> ?""",
+            (task_id, agent),
+        ).fetchall()
+        independent_edges = [(row["source"], row["verified_by"]) for row in evidence_rows]
+        verified_count = self._maximum_independent_source_verifier_pairs(independent_edges)
 
         if RISK_ORDER[task["risk"]] >= RISK_ORDER["critical"]:
             decision = Decision.ESCALATE
