@@ -30,6 +30,7 @@ class HafsOSCore:
     def __init__(self, path: str = ":memory:"):
         self.db = sqlite3.connect(path)
         self.db.row_factory = sqlite3.Row
+        self.db.execute("PRAGMA foreign_keys = ON")
         self.db.executescript(
             """
             CREATE TABLE IF NOT EXISTS tasks(
@@ -50,7 +51,10 @@ class HafsOSCore:
                 task_id INTEGER NOT NULL,
                 source TEXT NOT NULL,
                 claim TEXT NOT NULL,
-                verified INTEGER NOT NULL DEFAULT 0
+                verified INTEGER NOT NULL DEFAULT 0,
+                verified_by TEXT,
+                verified_at REAL,
+                FOREIGN KEY(task_id) REFERENCES tasks(id) ON DELETE CASCADE
             );
             CREATE TABLE IF NOT EXISTS audit(
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -60,14 +64,29 @@ class HafsOSCore:
             );
             """
         )
+        # Additive migration for databases created by the earlier prototype.
+        evidence_columns = {row["name"] for row in self.db.execute("PRAGMA table_info(evidence)")}
+        if "verified_by" not in evidence_columns:
+            self.db.execute("ALTER TABLE evidence ADD COLUMN verified_by TEXT")
+        if "verified_at" not in evidence_columns:
+            self.db.execute("ALTER TABLE evidence ADD COLUMN verified_at REAL")
+        self.db.commit()
 
     def grant(self, agent: str, permission: str) -> None:
+        if not isinstance(agent, str) or not agent.strip() or not isinstance(permission, str) or not permission.strip():
+            raise ValueError("agent and permission must be non-empty strings")
         self.db.execute("INSERT OR IGNORE INTO permissions VALUES (?, ?)", (agent, permission))
         self.db.commit()
 
     def create_task(self, description: str, risk: str, required_permission: str, evidence_required: int = 1) -> int:
         if risk not in RISK_ORDER:
             raise ValueError("unknown risk")
+        if not isinstance(description, str) or not description.strip():
+            raise ValueError("task description is required")
+        if not isinstance(required_permission, str) or not required_permission.strip():
+            raise ValueError("required permission is required")
+        if not isinstance(evidence_required, int) or isinstance(evidence_required, bool) or evidence_required < 0:
+            raise ValueError("evidence_required must be a non-negative integer")
         cur = self.db.execute(
             "INSERT INTO tasks(description,risk,required_permission,evidence_required) VALUES (?,?,?,?)",
             (description, risk, required_permission, evidence_required),
@@ -77,13 +96,41 @@ class HafsOSCore:
         self.db.commit()
         return task_id
 
-    def add_evidence(self, task_id: int, source: str, claim: str, verified: bool = False) -> None:
-        self.db.execute(
-            "INSERT INTO evidence(task_id,source,claim,verified) VALUES (?,?,?,?)",
-            (task_id, source, claim, int(verified)),
-        )
-        self._audit(task_id, f"evidence:{source}:{'verified' if verified else 'unverified'}")
-        self.db.commit()
+    def add_evidence(self, task_id: int, source: str, claim: str) -> int:
+        if not isinstance(source, str) or not source.strip() or not isinstance(claim, str) or not claim.strip():
+            raise ValueError("evidence source and claim must be non-empty strings")
+        task = self.db.execute("SELECT 1 FROM tasks WHERE id=?", (task_id,)).fetchone()
+        if task is None:
+            raise KeyError(task_id)
+        with self.db:
+            cur = self.db.execute(
+                "INSERT INTO evidence(task_id,source,claim,verified) VALUES (?,?,?,0)",
+                (task_id, source.strip(), claim.strip()),
+            )
+            evidence_id = int(cur.lastrowid)
+            self._audit(task_id, f"evidence:{source.strip()}:unverified")
+        return evidence_id
+
+    def verify_evidence(self, evidence_id: int, *, verifier: str) -> None:
+        if not isinstance(verifier, str) or not verifier.strip():
+            raise ValueError("verifier identity is required")
+        permitted = self.db.execute(
+            "SELECT 1 FROM permissions WHERE agent=? AND permission='verify_evidence'",
+            (verifier,),
+        ).fetchone() is not None
+        if not permitted:
+            raise PermissionError("verifier lacks verify_evidence permission")
+        with self.db:
+            row = self.db.execute(
+                "SELECT task_id, verified FROM evidence WHERE id=?", (evidence_id,)
+            ).fetchone()
+            if row is None:
+                raise KeyError(evidence_id)
+            self.db.execute(
+                "UPDATE evidence SET verified=1, verified_by=?, verified_at=? WHERE id=?",
+                (verifier, time.time(), evidence_id),
+            )
+            self._audit(row["task_id"], f"evidence-verified:{evidence_id}:by:{verifier}")
 
     def decide(self, task_id: int, agent: str) -> Decision:
         task = self.db.execute("SELECT * FROM tasks WHERE id=?", (task_id,)).fetchone()
@@ -95,10 +142,16 @@ class HafsOSCore:
             (agent, task["required_permission"]),
         ).fetchone() is not None
 
-        verified_count = self.db.execute(
-            "SELECT COUNT(DISTINCT source) AS n FROM evidence WHERE task_id=? AND verified=1",
+        evidence_counts = self.db.execute(
+            """SELECT COUNT(DISTINCT source) AS source_count,
+                      COUNT(DISTINCT verified_by) AS verifier_count
+               FROM evidence WHERE task_id=? AND verified=1""",
             (task_id,),
-        ).fetchone()["n"]
+        ).fetchone()
+        # A source only counts toward the threshold when it has been verified;
+        # repeated source rows or one verifier's repeated approvals do not
+        # manufacture independent corroboration.
+        verified_count = min(evidence_counts["source_count"], evidence_counts["verifier_count"])
 
         if RISK_ORDER[task["risk"]] >= RISK_ORDER["critical"]:
             decision = Decision.ESCALATE
@@ -128,6 +181,8 @@ class HafsOSCore:
 if __name__ == "__main__":
     core = HafsOSCore()
     core.grant("Veyra", "draft")
+    core.grant("Reviewer", "verify_evidence")
     task = core.create_task("Draft a low-risk brief", "low", "draft", 1)
-    core.add_evidence(task, "source-a", "requirements confirmed", verified=True)
+    evidence_id = core.add_evidence(task, "source-a", "requirements confirmed")
+    core.verify_evidence(evidence_id, verifier="Reviewer")
     print(core.decide(task, "Veyra"))
