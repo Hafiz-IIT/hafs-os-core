@@ -43,6 +43,36 @@ class HafsOSCoreTests(unittest.TestCase):
         core.verify_evidence(second, verifier="reviewer")
         self.assertEqual(core.decide(task, "agent"), Decision.ESCALATE)
 
+    def test_source_verifier_pairs_require_one_to_one_matching(self):
+        core = HafsOSCore()
+        core.grant("agent", "write")
+        for verifier in ("v1", "v2", "v3"):
+            core.grant(verifier, "verify_evidence")
+        task = core.create_task("x", "medium", "write", 3)
+        evidence = [
+            ("source-a", "v1"),
+            ("source-a", "v2"),
+            ("source-a", "v3"),
+            ("source-b", "v1"),
+            ("source-c", "v1"),
+        ]
+        for source, verifier in evidence:
+            evidence_id = core.add_evidence(task, source, "ok")
+            core.verify_evidence(evidence_id, verifier=verifier)
+        self.assertEqual(core.decide(task, "agent"), Decision.VERIFY)
+
+    def test_action_agent_cannot_count_as_its_own_independent_verifier(self):
+        core = HafsOSCore()
+        core.grant("agent", "write")
+        core.grant("agent", "verify_evidence")
+        core.grant("reviewer", "verify_evidence")
+        task = core.create_task("x", "high", "write", 2)
+        first = core.add_evidence(task, "source-a", "ok")
+        second = core.add_evidence(task, "source-b", "ok")
+        core.verify_evidence(first, verifier="agent")
+        core.verify_evidence(second, verifier="reviewer")
+        self.assertEqual(core.decide(task, "agent"), Decision.VERIFY)
+
     def test_critical_always_escalates(self):
         core = HafsOSCore()
         core.grant("agent", "write")
