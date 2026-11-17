@@ -61,6 +61,12 @@ The GitHub profile README was not opened or modified.
 | A-06 | hybrid-lqr-rl-paper | Abstract could imply the current fixed residual was learned | Clarified that the learned residual is the proposed research direction, while the companion code remains a fixed residual | LaTeX CI triggered; verify latest run before merge |
 | A-07 | Hafiz-IIT portfolio docs | Research pipeline incorrectly called EGA arXiv-ready and used outdated control-manuscript titles/scopes | Draft PR #2 updates only `RESEARCH_PAPER_PIPELINE.md`; profile README untouched | Draft PR: https://github.com/Hafiz-IIT/Hafiz-IIT/pull/2 |
 
+| A-08 | cold-chain-digital-twin | Controlled simulation still counted a full timestep when only part of the interval was above the excursion threshold | Shared a linearly interpolated threshold-duration function between open-loop and controlled simulations; added finite-input checks and documented explicit-Euler/calibration limits | CI runs 44192707636 and 44192707716 passed |
+| A-09 | privacy-aware-recommender-lab | Consent audit events retained raw preference text | Event log now records action type only; evaluation docs explicitly state there is no differential privacy, encryption or verified cohort protection | CI run 44192757371 passed |
+| A-10 | memory-governor | `forget` only invalidated a row, leaving its text in the active memories table | `forget` now deletes the active row and tests the deletion; docs distinguish row deletion from guaranteed secure erasure | Updated CI is running after a test assertion correction |
+| A-11 | secure-doc-rag-agent | A string could be supplied as a sensitivity allowlist and interpreted as a character collection | Reject string allowlists and added regression test | CI is running on the updated branch |
+| A-12 | secure-doc-rag-agent | Tenant/principal identifiers are supplied by callers, not authenticated by the retrieval layer | Documentation now requires trusted identity claims from an upstream authenticated authorization layer; prototype is not described as standalone secure storage | Documentation/test workflow is running |
+
 ## Additional blockers retained
 
 ### Restaurant Order Management
