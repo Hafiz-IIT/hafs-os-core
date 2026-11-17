@@ -67,6 +67,9 @@ The GitHub profile README was not opened or modified.
 | A-11 | secure-doc-rag-agent | A string could be supplied as a sensitivity allowlist and interpreted as a character collection | Reject string allowlists and added regression test | CI run 44193037673 passed |
 | A-12 | secure-doc-rag-agent | Tenant/principal identifiers are supplied by callers, not authenticated by the retrieval layer | Documentation now requires trusted identity claims from an upstream authenticated authorization layer; prototype is not described as standalone secure storage | Documentation/test workflow passed in run 44193037673 |
 
+| A-13 | institutional-evidence-tracker | Verifier labels were caller-supplied and the audit log was mutable/in-memory, without authenticated identity or tamper evidence | Evaluation documentation now explicitly limits verifier labels, audit durability and legal-evidence claims | Documentation-only update; existing tests remain green |
+| A-14 | agent-evidence-probes | Independence groups and freshness timestamps are caller-asserted; lexical conflict detection is not semantic verification | Evaluation documentation now states the authentication, provenance, trusted-time and semantic limits | Documentation-only update; existing tests remain green |
+
 ## Additional blockers retained
 
 ### Restaurant Order Management
