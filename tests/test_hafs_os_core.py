@@ -27,7 +27,7 @@ class HafsOSCoreTests(unittest.TestCase):
     def test_evidence_cannot_be_self_marked_verified(self):
         core = HafsOSCore()
         task = core.create_task("x", "low", "write", 1)
-        evidence_id = core.add_evidence(task, "source-a", "ok")
+        evidence_id = core.add_evidence(task, "source-a", "ok", submitted_by="trader")
         with self.assertRaises(PermissionError):
             core.verify_evidence(evidence_id, verifier="untrusted")
         self.assertEqual(core.decide(task, "agent"), Decision.ASK)
@@ -37,7 +37,7 @@ class HafsOSCoreTests(unittest.TestCase):
         core.grant("agent", "write")
         core.grant("reviewer", "verify_evidence")
         task = core.create_task("x", "high", "write", 1)
-        first = core.add_evidence(task, "source-a", "ok")
+        first = core.add_evidence(task, "source-a", "ok", submitted_by="trader")
         second = core.add_evidence(task, "source-b", "ok", submitted_by="trader")
         core.verify_evidence(first, verifier="reviewer")
         core.verify_evidence(second, verifier="reviewer")
@@ -67,8 +67,8 @@ class HafsOSCoreTests(unittest.TestCase):
         core.grant("agent", "verify_evidence")
         core.grant("reviewer", "verify_evidence")
         task = core.create_task("x", "high", "write", 2)
-        first = core.add_evidence(task, "source-a", "ok")
-        second = core.add_evidence(task, "source-b", "ok")
+        first = core.add_evidence(task, "source-a", "ok", submitted_by="trader")
+        second = core.add_evidence(task, "source-b", "ok", submitted_by="trader")
         core.verify_evidence(first, verifier="agent")
         core.verify_evidence(second, verifier="reviewer")
         self.assertEqual(core.decide(task, "agent"), Decision.VERIFY)
