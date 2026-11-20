@@ -134,6 +134,8 @@ class HafsOSCore:
             ).fetchone()
             if row is None:
                 raise KeyError(evidence_id)
+            if not row["submitted_by"]:
+                raise PermissionError("legacy evidence without submitter attribution cannot be verified")
             if row["submitted_by"] == verifier.strip():
                 raise PermissionError("an evidence submitter cannot verify their own evidence")
             if row["verified"]:
