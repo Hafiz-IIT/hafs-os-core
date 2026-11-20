@@ -9,35 +9,40 @@ class DependencyCycle(ValueError):
 
 class TaskGraph:
     def __init__(self):
-        self.dependencies: dict[str, set[str]] = {}
+        self._dependencies: dict[str, set[str]] = {}
+
+    @property
+    def dependencies(self) -> dict[str, frozenset[str]]:
+        # Return immutable snapshots so callers cannot bypass cycle validation.
+        return {key: frozenset(value) for key, value in self._dependencies.items()}
 
     def add_task(self, task_id: str) -> None:
         if not isinstance(task_id, str) or not task_id.strip():
             raise ValueError("task_id must be a non-empty string")
-        self.dependencies.setdefault(task_id, set())
+        self._dependencies.setdefault(task_id, set())
 
     def add_dependency(self, task_id: str, prerequisite_id: str) -> None:
         if any(not isinstance(value, str) or not value.strip() for value in (task_id, prerequisite_id)):
             raise ValueError("task identifiers must be non-empty strings")
-        snapshot = {key: set(value) for key, value in self.dependencies.items()}
+        snapshot = {key: set(value) for key, value in self._dependencies.items()}
         try:
             self.add_task(task_id)
             self.add_task(prerequisite_id)
-            self.dependencies[task_id].add(prerequisite_id)
+            self._dependencies[task_id].add(prerequisite_id)
             self.topological_order()
         except Exception:
-            self.dependencies = snapshot
+            self._dependencies = snapshot
             raise
 
     def ready_tasks(self, completed: set[str]) -> list[str]:
         return sorted(
             task
-            for task, prerequisites in self.dependencies.items()
+            for task, prerequisites in self._dependencies.items()
             if task not in completed and prerequisites <= completed
         )
 
     def topological_order(self) -> list[str]:
-        remaining = {k: set(v) for k, v in self.dependencies.items()}
+        remaining = {k: set(v) for k, v in self._dependencies.items()}
         order: list[str] = []
 
         while remaining:
@@ -53,7 +58,7 @@ class TaskGraph:
         return order
 
 
-@dataclass
+@dataclass(frozen=True)
 class Approval:
     task_id: str
     requested_by: str
@@ -84,7 +89,7 @@ class ApprovalLedger:
             raise PermissionError("actor is not the designated approver")
         if approval.approved:
             raise ValueError("approval has already been granted")
-        approval.approved = True
+        self._approvals[task_id] = Approval(approval.task_id, approval.requested_by, approval.approver, True)
 
     def is_approved(self, task_id: str) -> bool:
         approval = self._approvals.get(task_id)
