@@ -144,6 +144,10 @@ The following changes were made after the initial 2026-11-18 inventory. All rema
 
 | A-45 | multi-agent-logistics-sim | Mutable Agent instances could be altered after construction and then passed directly to bid/distance paths; whitespace variants could bypass duplicate-name checks; huge integer fields/penalties could overflow conversion | Reconstruct and revalidate agent snapshots in direct and batch paths, canonicalize IDs, and use overflow-safe finite conversion | [17 unit tests](https://github.com/Hafiz-IIT/multi-agent-logistics-sim/actions/runs/44806449043) and [CI](https://github.com/Hafiz-IIT/multi-agent-logistics-sim/actions/runs/44806449011) passed on 348677a |
 
+### Additional time-dependent routing numerical follow-up (2026-11-21)
+
+| A-46 | traffic-incident-routing-lab | Absolute clock subtraction lost precision in route durations; rounding erased tiny trips; edge-arrival arithmetic could overflow; oversized integer times were not controlled | Sum edge-level driving/waiting durations, preserve precision, scale interpolation/arrival checks and harden finite conversion | [15 unit tests](https://github.com/Hafiz-IIT/traffic-incident-routing-lab/actions/runs/44806692733) and [CI](https://github.com/Hafiz-IIT/traffic-incident-routing-lab/actions/runs/44806692671) passed on f23e1ef |
+
 ### Portfolio-wide CI snapshot (2026-11-20)
 
 The latest GitHub Actions run for each of the 33 project repositories completed successfully on its current main, audit, research, or manuscript branch. This includes the application prototypes, simulation/control labs, three core governance/evidence repositories, and manuscript-integrity workflows. Two earlier failures (restaurant request-validation module resolution and Koopman operator overflow rejection) were followed by successful runs after the corresponding fixes. This is evidence that the configured checks pass at the recorded commits; it is not a substitute for a line-by-line security review, independent scientific replication, or deployment validation.
