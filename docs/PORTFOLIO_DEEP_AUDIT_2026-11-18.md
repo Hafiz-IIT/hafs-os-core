@@ -107,6 +107,10 @@ The following changes were made after the initial 2026-11-18 inventory. All rema
 | A-35 | multilingual-reliability-bench | Unsupported-only language groups displayed 0.0 accuracy/coverage with no supported denominator; empty gold answers could match empty outputs; identifier whitespace/case variants could bypass duplicate detection; paired support flags lacked container validation | Return undefined metrics for zero supported cases; reject empty/punctuation-only gold answers; canonicalize IDs/language labels; validate support-flag mapping type | [15 unit tests](https://github.com/Hafiz-IIT/multilingual-reliability-bench/actions/runs/44802070264) passed on 6c30e55 |
 
 
+### Additional follow-up finding (2026-11-21)
+
+| A-36 | secure-doc-rag-agent | `extractive_draft` could report sufficient evidence after truncating the returned snippets below the configured `min_hits` threshold; invalid `min_hits` types could fail before the retrieval validator | Require positive-integer `min_hits` and `max_snippets >= min_hits` before retrieval; add regressions | [15 unit tests](https://github.com/Hafiz-IIT/secure-doc-rag-agent/actions/runs/44802505911) passed on fef6e07 |
+
 ### Portfolio-wide CI snapshot (2026-11-20)
 
 The latest GitHub Actions run for each of the 33 project repositories completed successfully on its current main, audit, research, or manuscript branch. This includes the application prototypes, simulation/control labs, three core governance/evidence repositories, and manuscript-integrity workflows. Two earlier failures (restaurant request-validation module resolution and Koopman operator overflow rejection) were followed by successful runs after the corresponding fixes. This is evidence that the configured checks pass at the recorded commits; it is not a substitute for a line-by-line security review, independent scientific replication, or deployment validation.
