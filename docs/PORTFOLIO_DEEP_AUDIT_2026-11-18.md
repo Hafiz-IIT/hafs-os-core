@@ -111,6 +111,10 @@ The following changes were made after the initial 2026-11-18 inventory. All rema
 
 | A-36 | secure-doc-rag-agent | `extractive_draft` could report sufficient evidence after truncating the returned snippets below the configured `min_hits` threshold; invalid `min_hits` types could fail before the retrieval validator | Require positive-integer `min_hits` and `max_snippets >= min_hits` before retrieval; add regressions | [15 unit tests](https://github.com/Hafiz-IIT/secure-doc-rag-agent/actions/runs/44802505911) passed on fef6e07 |
 
+### Additional numerical validation follow-up (2026-11-21)
+
+| A-37 | predictive-intelligence-platform | Zero-variance histories of all zeros could miss nonzero outliers; candidate/history scale ratios could overflow; huge integers could escape numeric validation | Include the candidate in anomaly scaling, represent zero-variance outliers without infinite z-scores, and normalize/reject extreme numeric conversions | [15 unit tests](https://github.com/Hafiz-IIT/predictive-intelligence-platform/actions/runs/44803007140) and [CI](https://github.com/Hafiz-IIT/predictive-intelligence-platform/actions/runs/44803006995) passed on 797f2f0 |
+
 ### Portfolio-wide CI snapshot (2026-11-20)
 
 The latest GitHub Actions run for each of the 33 project repositories completed successfully on its current main, audit, research, or manuscript branch. This includes the application prototypes, simulation/control labs, three core governance/evidence repositories, and manuscript-integrity workflows. Two earlier failures (restaurant request-validation module resolution and Koopman operator overflow rejection) were followed by successful runs after the corresponding fixes. This is evidence that the configured checks pass at the recorded commits; it is not a substitute for a line-by-line security review, independent scientific replication, or deployment validation.
