@@ -73,6 +73,16 @@ class HafsOSCoreTests(unittest.TestCase):
         core.verify_evidence(second, verifier="reviewer")
         self.assertEqual(core.decide(task, "agent"), Decision.VERIFY)
 
+    def test_legacy_evidence_without_submitter_cannot_be_verified(self):
+        core = HafsOSCore()
+        core.grant("reviewer", "verify_evidence")
+        task = core.create_task("x", "low", "write", 1)
+        evidence_id = core.add_evidence(task, "source-a", "ok", submitted_by="trader")
+        core.db.execute("UPDATE evidence SET submitted_by='' WHERE id=?", (evidence_id,))
+        core.db.commit()
+        with self.assertRaises(PermissionError):
+            core.verify_evidence(evidence_id, verifier="reviewer")
+
     def test_submitter_cannot_verify_own_evidence(self):
         core = HafsOSCore()
         core.grant("trader", "verify_evidence")
