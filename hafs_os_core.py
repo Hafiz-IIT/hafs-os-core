@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import Enum
-import math
 import sqlite3
 import time
 
@@ -97,6 +96,8 @@ class HafsOSCore:
         self._required_text("claim", claim)
         if verified:
             raise ValueError("evidence cannot self-assert verification; use verify_evidence()")
+        if self.db.execute("SELECT 1 FROM tasks WHERE id=?", (task_id,)).fetchone() is None:
+            raise KeyError(task_id)
         cur = self.db.execute(
             "INSERT INTO evidence(task_id,source,claim,verified) VALUES (?,?,?,0)",
             (task_id, source, claim),
