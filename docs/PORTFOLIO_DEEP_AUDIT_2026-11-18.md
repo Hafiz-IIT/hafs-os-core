@@ -93,7 +93,7 @@ The following changes were made after the initial 2026-11-18 inventory. All rema
 | A-28 | hafs-os-core | Task graph and approval records could be mutated through returned/public objects, bypassing cycle and approval checks; identifiers lacked consistent validation | Made graph dependency access read-only via snapshots, made approval records immutable, added validation/normalization and regression tests | [Tests](https://github.com/Hafiz-IIT/hafs-os-core/actions/runs/44798043873) and [CI](https://github.com/Hafiz-IIT/hafs-os-core/actions/runs/44798043753) passed on commit 9e6e1 |
 
 
-| A-29 | agent-evidence-probes | Groq's prior Llama 3.3 default had been deprecated; the old OpenAI-compatible payload used a system role and token parameter not recommended for the replacement reasoning model | Updated default to Groq GPT-OSS 120B, Anthropic Haiku 4.5, provider-specific prompt roles and max_completion_tokens; added provider payload tests | Latest unit tests, Tier 1 run and Tier 2 dataset validation passed on commit fd36ff6 |
+| A-29 | agent-evidence-probes | Groq's prior Llama 3.3 default had been deprecated; the old OpenAI-compatible payload used a system role and token parameter not recommended for the replacement reasoning model | Updated default to Groq GPT-OSS 120B, Anthropic Haiku 4.5, provider-specific prompt roles and max_completion_tokens; added provider payload tests | [30 unit tests](https://github.com/Hafiz-IIT/agent-evidence-probes/actions/runs/44798764437), [Tier 1](https://github.com/Hafiz-IIT/agent-evidence-probes/actions/runs/44798764094), [Tier 2 dataset validation](https://github.com/Hafiz-IIT/agent-evidence-probes/actions/runs/44798764259), and [CI](https://github.com/Hafiz-IIT/agent-evidence-probes/actions/runs/44798764178) passed on commit f422143 |
 | A-30 | portfolio audit index | Earlier matrix contained stale workflow claims and a non-existent multilingual-reliability-bench-paper repository | Replaced stale matrix with a pointer to the canonical deep-audit report; corrected project count and status vocabulary | Documentation update; current repo count is 33 projects plus profile repository |
 
 
@@ -107,7 +107,7 @@ The latest GitHub Actions run for each of the 33 project repositories completed 
 - All 100 are constructed fictional scenarios. They are not real customs records, shipment documents, private user memories or observed incidents.
 - Tier 2 compares two actual model API prompt conditions (neutral baseline versus evidence-gated prompt) when a provider key is supplied. It is a prompt-level intervention, not an external deterministic controller.
 - The 100-case dataset validation passed without API calls. No Tier 2 model results have been generated because no provider credential was supplied.
-- The 90-second target is best-effort; provider rate limits, latency and availability are outside the runner's control.
+- The full run makes 200 primary API requests and allows up to two retries per case and condition (up to 600 total attempts). The 90-second target is best-effort; provider rate limits, latency and availability are outside the runner's control.
 
 ### Remaining focused blockers
 
