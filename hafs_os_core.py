@@ -52,6 +52,7 @@ class HafsOSCore:
                 source TEXT NOT NULL,
                 claim TEXT NOT NULL,
                 verified INTEGER NOT NULL DEFAULT 0,
+                submitted_by TEXT NOT NULL DEFAULT '',
                 verified_by TEXT,
                 verified_at REAL,
                 FOREIGN KEY(task_id) REFERENCES tasks(id) ON DELETE CASCADE
@@ -65,6 +66,8 @@ class HafsOSCore:
             """
         )
         evidence_columns = {row["name"] for row in self.db.execute("PRAGMA table_info(evidence)")}
+        if "submitted_by" not in evidence_columns:
+            self.db.execute("ALTER TABLE evidence ADD COLUMN submitted_by TEXT NOT NULL DEFAULT ''")
         if "verified_by" not in evidence_columns:
             self.db.execute("ALTER TABLE evidence ADD COLUMN verified_by TEXT")
         if "verified_at" not in evidence_columns:
@@ -74,7 +77,9 @@ class HafsOSCore:
     def grant(self, agent: str, permission: str) -> None:
         if not isinstance(agent, str) or not agent.strip() or not isinstance(permission, str) or not permission.strip():
             raise ValueError("agent and permission must be non-empty strings")
-        self.db.execute("INSERT OR IGNORE INTO permissions VALUES (?, ?)", (agent, permission))
+        cur = self.db.execute("INSERT OR IGNORE INTO permissions VALUES (?, ?)", (agent, permission))
+        if cur.rowcount:
+            self._audit(None, f"permission-granted:{agent}:{permission}")
         self.db.commit()
 
     def create_task(self, description: str, risk: str, required_permission: str, evidence_required: int = 1) -> int:
@@ -95,16 +100,20 @@ class HafsOSCore:
         self.db.commit()
         return task_id
 
-    def add_evidence(self, task_id: int, source: str, claim: str) -> int:
+    def add_evidence(self, task_id: int, source: str, claim: str, *, submitted_by: str) -> int:
+        if isinstance(task_id, bool) or not isinstance(task_id, int) or task_id < 1:
+            raise ValueError("task_id must be a positive integer")
         if not isinstance(source, str) or not source.strip() or not isinstance(claim, str) or not claim.strip():
             raise ValueError("evidence source and claim must be non-empty strings")
+        if not isinstance(submitted_by, str) or not submitted_by.strip():
+            raise ValueError("submitted_by identity is required")
         task = self.db.execute("SELECT 1 FROM tasks WHERE id=?", (task_id,)).fetchone()
         if task is None:
             raise KeyError(task_id)
         with self.db:
             cur = self.db.execute(
-                "INSERT INTO evidence(task_id,source,claim,verified) VALUES (?,?,?,0)",
-                (task_id, source.strip(), claim.strip()),
+                "INSERT INTO evidence(task_id,source,claim,verified,submitted_by) VALUES (?,?,?,0,?)",
+                (task_id, source.strip(), claim.strip(), submitted_by.strip()),
             )
             evidence_id = int(cur.lastrowid)
             self._audit(task_id, f"evidence:{source.strip()}:unverified")
@@ -121,10 +130,14 @@ class HafsOSCore:
             raise PermissionError("verifier lacks verify_evidence permission")
         with self.db:
             row = self.db.execute(
-                "SELECT task_id, verified FROM evidence WHERE id=?", (evidence_id,)
+                "SELECT task_id, verified, submitted_by FROM evidence WHERE id=?", (evidence_id,)
             ).fetchone()
             if row is None:
                 raise KeyError(evidence_id)
+            if row["submitted_by"] == verifier.strip():
+                raise PermissionError("an evidence submitter cannot verify their own evidence")
+            if row["verified"]:
+                raise ValueError("evidence has already been verified")
             self.db.execute(
                 "UPDATE evidence SET verified=1, verified_by=?, verified_at=? WHERE id=?",
                 (verifier, time.time(), evidence_id),
@@ -188,9 +201,34 @@ class HafsOSCore:
         else:
             decision = Decision.ACT
 
+        status = {
+            Decision.ACT: "authorized",
+            Decision.ASK: "awaiting_permission",
+            Decision.VERIFY: "awaiting_evidence",
+            Decision.ESCALATE: "escalated",
+        }[decision]
+        self.db.execute("UPDATE tasks SET status=? WHERE id=?", (status, task_id))
         self._audit(task_id, f"decision:{agent}:{decision.value}")
         self.db.commit()
         return decision
+
+    def task_status(self, task_id: int) -> str:
+        row = self.db.execute("SELECT status FROM tasks WHERE id=?", (task_id,)).fetchone()
+        if row is None:
+            raise KeyError(task_id)
+        return str(row["status"])
+
+    def audit_events(self) -> list[str]:
+        return [row["event"] for row in self.db.execute("SELECT event FROM audit ORDER BY id")]
+
+    def close(self) -> None:
+        self.db.close()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc, traceback):
+        self.close()
 
     def audit(self, task_id: int) -> list[str]:
         return [
