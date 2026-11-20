@@ -65,6 +65,9 @@ class HafsOSCore:
             );
             """
         )
+        task_columns = {row["name"] for row in self.db.execute("PRAGMA table_info(tasks)")}
+        if "status" not in task_columns:
+            self.db.execute("ALTER TABLE tasks ADD COLUMN status TEXT NOT NULL DEFAULT 'pending'")
         evidence_columns = {row["name"] for row in self.db.execute("PRAGMA table_info(evidence)")}
         if "submitted_by" not in evidence_columns:
             self.db.execute("ALTER TABLE evidence ADD COLUMN submitted_by TEXT NOT NULL DEFAULT ''")
