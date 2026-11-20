@@ -20,7 +20,7 @@ class HafsOSCoreTests(unittest.TestCase):
         core.grant("agent", "write")
         task = core.create_task("x", "low", "write", 1)
         core.grant("reviewer", "verify_evidence")
-        evidence_id = core.add_evidence(task, "source-a", "ok")
+        evidence_id = core.add_evidence(task, "source-a", "ok", submitted_by="trader")
         core.verify_evidence(evidence_id, verifier="reviewer")
         self.assertEqual(core.decide(task, "agent"), Decision.ACT)
 
@@ -38,7 +38,7 @@ class HafsOSCoreTests(unittest.TestCase):
         core.grant("reviewer", "verify_evidence")
         task = core.create_task("x", "high", "write", 1)
         first = core.add_evidence(task, "source-a", "ok")
-        second = core.add_evidence(task, "source-b", "ok")
+        second = core.add_evidence(task, "source-b", "ok", submitted_by="trader")
         core.verify_evidence(first, verifier="reviewer")
         core.verify_evidence(second, verifier="reviewer")
         self.assertEqual(core.decide(task, "agent"), Decision.ESCALATE)
@@ -57,7 +57,7 @@ class HafsOSCoreTests(unittest.TestCase):
             ("source-c", "v1"),
         ]
         for source, verifier in evidence:
-            evidence_id = core.add_evidence(task, source, "ok")
+            evidence_id = core.add_evidence(task, source, "ok", submitted_by="trader")
             core.verify_evidence(evidence_id, verifier=verifier)
         self.assertEqual(core.decide(task, "agent"), Decision.VERIFY)
 
@@ -72,6 +72,21 @@ class HafsOSCoreTests(unittest.TestCase):
         core.verify_evidence(first, verifier="agent")
         core.verify_evidence(second, verifier="reviewer")
         self.assertEqual(core.decide(task, "agent"), Decision.VERIFY)
+
+    def test_submitter_cannot_verify_own_evidence(self):
+        core = HafsOSCore()
+        core.grant("trader", "verify_evidence")
+        task = core.create_task("x", "low", "write", 1)
+        evidence_id = core.add_evidence(task, "source-a", "ok", submitted_by="trader")
+        with self.assertRaises(PermissionError):
+            core.verify_evidence(evidence_id, verifier="trader")
+
+    def test_task_status_tracks_gate_decision(self):
+        core = HafsOSCore()
+        core.grant("agent", "write")
+        task = core.create_task("x", "medium", "write", 1)
+        self.assertEqual(core.decide(task, "agent"), Decision.VERIFY)
+        self.assertEqual(core.task_status(task), "awaiting_evidence")
 
     def test_critical_always_escalates(self):
         core = HafsOSCore()
