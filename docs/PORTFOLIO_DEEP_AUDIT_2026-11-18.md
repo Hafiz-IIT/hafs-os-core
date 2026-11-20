@@ -115,6 +115,10 @@ The following changes were made after the initial 2026-11-18 inventory. All rema
 
 | A-37 | predictive-intelligence-platform | Zero-variance histories of all zeros could miss nonzero outliers; candidate/history scale ratios could overflow; huge integers could escape numeric validation | Include the candidate in anomaly scaling, represent zero-variance outliers without infinite z-scores, and normalize/reject extreme numeric conversions | [15 unit tests](https://github.com/Hafiz-IIT/predictive-intelligence-platform/actions/runs/44803007140) and [CI](https://github.com/Hafiz-IIT/predictive-intelligence-platform/actions/runs/44803006995) passed on 797f2f0 |
 
+### Additional cargo numeric robustness follow-up (2026-11-21)
+
+| A-38 | cargo-scan-consistency-lab | Extreme but finite positive measurements could overflow relative-ratio comparison; huge integer confidence, threshold and scenario parameters could escape validation | Added shared finite-float conversion with overflow handling and safe ratio calculation; regression tests cover extreme measurements and huge integers | [20 unit tests](https://github.com/Hafiz-IIT/cargo-scan-consistency-lab/actions/runs/44803487697) and [CI](https://github.com/Hafiz-IIT/cargo-scan-consistency-lab/actions/runs/44803487699) passed on 7b2b008 |
+
 ### Portfolio-wide CI snapshot (2026-11-20)
 
 The latest GitHub Actions run for each of the 33 project repositories completed successfully on its current main, audit, research, or manuscript branch. This includes the application prototypes, simulation/control labs, three core governance/evidence repositories, and manuscript-integrity workflows. Two earlier failures (restaurant request-validation module resolution and Koopman operator overflow rejection) were followed by successful runs after the corresponding fixes. This is evidence that the configured checks pass at the recorded commits; it is not a substitute for a line-by-line security review, independent scientific replication, or deployment validation.
