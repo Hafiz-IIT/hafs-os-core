@@ -12,6 +12,8 @@ class TaskGraph:
         self.dependencies: dict[str, set[str]] = {}
 
     def add_task(self, task_id: str) -> None:
+        if not isinstance(task_id, str) or not task_id.strip():
+            raise ValueError("task_id must be a non-empty string")
         self.dependencies.setdefault(task_id, set())
 
     def add_dependency(self, task_id: str, prerequisite_id: str) -> None:
