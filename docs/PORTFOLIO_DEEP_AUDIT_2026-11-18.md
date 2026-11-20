@@ -136,6 +136,10 @@ The following changes were made after the initial 2026-11-18 inventory. All rema
 
 | A-43 | hybrid-lqr-rl-control | Finite-number validation could leak conversion overflow for extremely large integer states; direct `action()` accepted arbitrary config objects until attribute access failed | Harden numeric conversion and validate direct-action configuration type | [9 unit tests](https://github.com/Hafiz-IIT/hybrid-lqr-rl-control/actions/runs/44805351997) passed on 136d767 |
 
+### Additional residual-control numeric validation follow-up (2026-11-21)
+
+| A-44 | residual-rl-linear-priors | Finite-number validation could leak `OverflowError` for an initial state too large to convert to float | Harden conversion and add an oversized-state regression test | [9 unit tests](https://github.com/Hafiz-IIT/residual-rl-linear-priors/actions/runs/44805610834) passed on 39f3ab0 |
+
 ### Portfolio-wide CI snapshot (2026-11-20)
 
 The latest GitHub Actions run for each of the 33 project repositories completed successfully on its current main, audit, research, or manuscript branch. This includes the application prototypes, simulation/control labs, three core governance/evidence repositories, and manuscript-integrity workflows. Two earlier failures (restaurant request-validation module resolution and Koopman operator overflow rejection) were followed by successful runs after the corresponding fixes. This is evidence that the configured checks pass at the recorded commits; it is not a substitute for a line-by-line security review, independent scientific replication, or deployment validation.
