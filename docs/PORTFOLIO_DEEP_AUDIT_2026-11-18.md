@@ -96,6 +96,11 @@ The following changes were made after the initial 2026-11-18 inventory. All rema
 | A-29 | agent-evidence-probes | Groq's prior Llama 3.3 default had been deprecated; the old OpenAI-compatible payload used a system role and token parameter not recommended for the replacement reasoning model | Updated default to Groq GPT-OSS 120B, Anthropic Haiku 4.5, provider-specific prompt roles and max_completion_tokens; added provider payload tests | Latest unit tests, Tier 1 run and Tier 2 dataset validation passed on commit fd36ff6 |
 | A-30 | portfolio audit index | Earlier matrix contained stale workflow claims and a non-existent multilingual-reliability-bench-paper repository | Replaced stale matrix with a pointer to the canonical deep-audit report; corrected project count and status vocabulary | Documentation update; current repo count is 33 projects plus profile repository |
 
+
+### Portfolio-wide CI snapshot (2026-11-20)
+
+The latest GitHub Actions run for each of the 33 project repositories completed successfully on its current main, audit, research, or manuscript branch. This includes the application prototypes, simulation/control labs, three core governance/evidence repositories, and manuscript-integrity workflows. Two earlier failures (restaurant request-validation module resolution and Koopman operator overflow rejection) were followed by successful runs after the corresponding fixes. This is evidence that the configured checks pass at the recorded commits; it is not a substitute for a line-by-line security review, independent scientific replication, or deployment validation.
+
 ### Tier 2 evaluation status — important distinction
 
 - The three datasets contain 60 general probes, 25 EXIM-context cases and 15 memory-governance cases.
