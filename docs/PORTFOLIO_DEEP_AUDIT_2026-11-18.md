@@ -2,13 +2,13 @@
 
 ## Scope and method
 
-This pass inventories all 34 repositories visible to the connected GitHub account, excluding all README files from review and edits. It inspects repository metadata and non-README trees, the latest GitHub Actions runs on the active audit/research branches, open pull-request structure, representative implementation and test files, and the research manuscripts/protocols.
+This pass inventories 33 project repositories plus the GitHub profile repository. The profile README is excluded from analysis and edits. Repository READMEs are used only to establish project purpose; no profile README content is part of the audit. The review inspects repository metadata, non-profile source trees, GitHub Actions runs on active audit/research branches, open pull-request structure, representative implementation and test files, and research manuscripts/protocols.
 
 **Execution evidence:** 33 project repositories have configured GitHub Actions; their latest audit/research-branch runs completed successfully at the time of the initial sweep. The GitHub profile repository has no workflow. Subsequent focused fixes below have their own CI runs.
 
 **Important boundary:** CI success means only that configured tests/builds passed. It is not formal verification, scientific peer review, production deployment, or real-world validation. This is a first deep-audit pass, not a line-by-line formal security review of every file in every repository.
 
-The GitHub profile README was not opened or modified.
+The GitHub profile README is excluded and was not modified.
 
 ## Repository inventory
 
@@ -69,6 +69,44 @@ The GitHub profile README was not opened or modified.
 
 | A-13 | institutional-evidence-tracker | Verifier labels were caller-supplied and the audit log was mutable/in-memory, without authenticated identity or tamper evidence | Evaluation documentation now explicitly limits verifier labels, audit durability and legal-evidence claims | Documentation-only update; existing tests remain green |
 | A-14 | agent-evidence-probes | Independence groups and freshness timestamps are caller-asserted; lexical conflict detection is not semantic verification | Evaluation documentation now states the authentication, provenance, trusted-time and semantic limits | Documentation-only update; existing tests remain green |
+
+
+## 2026-11-20 follow-up: deeper implementation and evaluation pass
+
+The following changes were made after the initial 2026-11-18 inventory. All remain on research/audit branches; no main branch was modified.
+
+| ID | Repository | Additional defect or limitation found | Repair / disposition | Latest verification |
+|---|---|---|---|---|
+| A-15 | agent-evidence-probes | Tier 1 deterministic and Tier 2 LLM runners both used eval/run_100_eval.py and collided on data/probes_60.json; earlier runner exposed different schema assumptions | Split deterministic runner to eval/run_tier1_conformance.py; reserved eval/run_100_eval.py and requested dataset names for Tier 2; added 60 probes, prompt-blinding tests, provider-specific request formats, dataset validation, timestamped metadata, and separate raw-trace/summary outputs | [25 unit tests](https://github.com/Hafiz-IIT/agent-evidence-probes/actions/runs/44796385219), [Tier 1 evaluation](https://github.com/Hafiz-IIT/agent-evidence-probes/actions/runs/44796385223), [100-case validation](https://github.com/Hafiz-IIT/agent-evidence-probes/actions/runs/44796385131), [CI](https://github.com/Hafiz-IIT/agent-evidence-probes/actions/runs/44796385127) passed |
+| A-16 | agent-evidence-probes | Evidence age, confidence and independent_group are caller-asserted; the prototype cannot authenticate lineage or detect semantic contradictions | Ported strict input validation and future-timestamp rejection; documented the trust boundary and preserved synthetic-only claim limits | Same central checks above passed |
+| A-17 | EXIM-AI-Evidence-Gated-Autonomy | Invalid provenance metadata could be bypassed by the low-risk early return; canonical JSON hashing differed for Unicode payloads | Moved integrity checks ahead of low-risk return; aligned core hashing with attestation canonicalization; added low-risk and Bengali Unicode regression tests | Previous manuscript build passed at commit 0217644; updated build on commit 4637942 was still running at report update |
+| A-18 | EXIM-AI-Evidence-Gated-Autonomy | Related-work bibliography used a generic SLSA homepage and an arXiv preprint where a published ICML record exists | Updated references to PMLR/NeurIPS/USENIX records and SLSA v1.2 specification; removed unused preprint entry | Included in the current manuscript-build workflow; final status pending |
+| A-19 | EXIM-AI-Evidence-Gated-Autonomy | Legacy records without provenance envelopes remain accepted for compatibility; this is not equivalent to verified provenance | Explicitly retained as a limitation rather than silently changing historical benchmark semantics | Documented in PR #16 |
+| A-20 | memory-governor | Atomic supersession alone did not cover all input validation and temporal edge cases; caller-supplied provenance is not authenticated | Consolidated the more complete Tier 2 branch implementation: input validation, strict expiry, future-date rejection, atomic supersession, durable rejection audit, context-manager support, security-boundary documentation and dataset tests | [Memory tests](https://github.com/Hafiz-IIT/memory-governor/actions/runs/44796608689) and [CI](https://github.com/Hafiz-IIT/memory-governor/actions/runs/44796608866) passed |
+| A-21 | exim-document-truth-bench | Missing comparison fields could be silently ignored; duplicate document kinds raised an exception instead of a structured action | Missing required cross-document fields now yield VERIFY; duplicate kinds yield ESCALATE with structured report fields | [Tests](https://github.com/Hafiz-IIT/exim-document-truth-bench/actions/runs/44795727885) and [CI](https://github.com/Hafiz-IIT/exim-document-truth-bench/actions/runs/44795727895) passed |
+| A-22 | cargo-scan-consistency-lab | A high-confidence category could suppress review despite a conflicting category from another independent sensor group | Any cross-category disagreement now requires review; added high-confidence conflict regression | [Tests](https://github.com/Hafiz-IIT/cargo-scan-consistency-lab/actions/runs/44795807192) and [CI](https://github.com/Hafiz-IIT/cargo-scan-consistency-lab/actions/runs/44795807207) passed |
+| A-23 | safe-rl-action-gate | A finite state/action could overflow during simulation and raise outside the gate's fail-closed decision path | Simulation arithmetic/value errors now produce a BLOCK result with simulation_error; added regression | [Tests](https://github.com/Hafiz-IIT/safe-rl-action-gate/actions/runs/44795442058) and [CI](https://github.com/Hafiz-IIT/safe-rl-action-gate/actions/runs/44795442086) passed |
+| A-24 | predictive-intelligence-platform | Intermediate sums/squared deviations could overflow on extreme but finite inputs and mask anomalies | Added scaled mean/variance calculations and explicit overflow rejection for unrepresentable MAE; added regressions | [Tests](https://github.com/Hafiz-IIT/predictive-intelligence-platform/actions/runs/44795511450) and CI passed |
+| A-25 | hybrid-lqr-rl-control | Cubic residual exponentiation could overflow before the configured saturation bound was applied | Rewrote multiplication order to allow saturation and added extreme-state test | [CI](https://github.com/Hafiz-IIT/hybrid-lqr-rl-control/actions/runs/44795489215) passed on the later corrected commit |
+| A-26 | bayesian-safe-rl-paper | Introduction repeated the same continuous-control citation and overstated the relevance to the scalar implementation | Removed duplicate sentence and clarified that the companion implementation is only a scalar uncertainty gate | Manuscript CI pending after wording update |
+| A-27 | hybrid-lqr-rl-paper | Abstract described the fixed cubic residual as a bounded residual policy, which could imply a learned controller | Clarified the implemented component is a fixed cubic residual term, not a learned policy | Manuscript CI pending after wording update |
+| A-28 | hafs-os-core | Task graph and approval records could be mutated through returned/public objects, bypassing cycle and approval checks; identifiers lacked consistent validation | Made graph dependency access read-only via snapshots, made approval records immutable, added validation/normalization and regression tests | Earlier tests passed at commit a03ddb2; latest validation commit de6cb was still running |
+
+### Tier 2 evaluation status — important distinction
+
+- The three datasets contain 60 general probes, 25 EXIM-context cases and 15 memory-governance cases.
+- All 100 are constructed fictional scenarios. They are not real customs records, shipment documents, private user memories or observed incidents.
+- Tier 2 compares two actual model API prompt conditions (neutral baseline versus evidence-gated prompt) when a provider key is supplied. It is a prompt-level intervention, not an external deterministic controller.
+- The 100-case dataset validation passed without API calls. No Tier 2 model results have been generated because no provider credential was supplied.
+- The 90-second target is best-effort; provider rate limits, latency and availability are outside the runner's control.
+
+### Remaining focused blockers
+
+1. Complete the EXIM manuscript build on commit 4637942 and the HAFS OS test/CI run on commit de6cb.
+2. Run Tier 2 against one real provider/model, then repeat with a second model. Preserve raw traces and report failures/unscored cases.
+3. Complete line-by-line audits of the remaining smaller application/simulation repositories; the current portfolio review is broad and deep but not a formal proof or full security audit.
+4. For every manuscript, reconcile every result table with an immutable artifact/hash and check bibliography keys, DOI/venue, and claim scope.
+5. Keep all PRs as drafts until the full audit and final presentation review are complete.
 
 ## Additional blockers retained
 
