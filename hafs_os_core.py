@@ -77,18 +77,21 @@ class HafsOSCore:
     def grant(self, agent: str, permission: str) -> None:
         if not isinstance(agent, str) or not agent.strip() or not isinstance(permission, str) or not permission.strip():
             raise ValueError("agent and permission must be non-empty strings")
+        agent, permission = agent.strip(), permission.strip()
         cur = self.db.execute("INSERT OR IGNORE INTO permissions VALUES (?, ?)", (agent, permission))
         if cur.rowcount:
             self._audit(None, f"permission-granted:{agent}:{permission}")
         self.db.commit()
 
     def create_task(self, description: str, risk: str, required_permission: str, evidence_required: int = 1) -> int:
-        if risk not in RISK_ORDER:
+        if not isinstance(risk, str) or risk.strip().lower() not in RISK_ORDER:
             raise ValueError("unknown risk")
+        risk = risk.strip().lower()
         if not isinstance(description, str) or not description.strip():
             raise ValueError("task description is required")
         if not isinstance(required_permission, str) or not required_permission.strip():
             raise ValueError("required permission is required")
+        required_permission = required_permission.strip()
         if not isinstance(evidence_required, int) or isinstance(evidence_required, bool) or evidence_required < 0:
             raise ValueError("evidence_required must be a non-negative integer")
         cur = self.db.execute(
@@ -120,8 +123,11 @@ class HafsOSCore:
         return evidence_id
 
     def verify_evidence(self, evidence_id: int, *, verifier: str) -> None:
+        if isinstance(evidence_id, bool) or not isinstance(evidence_id, int) or evidence_id < 1:
+            raise ValueError("evidence_id must be a positive integer")
         if not isinstance(verifier, str) or not verifier.strip():
             raise ValueError("verifier identity is required")
+        verifier = verifier.strip()
         permitted = self.db.execute(
             "SELECT 1 FROM permissions WHERE agent=? AND permission='verify_evidence'",
             (verifier,),
@@ -171,8 +177,11 @@ class HafsOSCore:
         return len(verifier_to_source)
 
     def decide(self, task_id: int, agent: str) -> Decision:
+        if isinstance(task_id, bool) or not isinstance(task_id, int) or task_id < 1:
+            raise ValueError("task_id must be a positive integer")
         if not isinstance(agent, str) or not agent.strip():
             raise ValueError("acting agent identity is required")
+        agent = agent.strip()
         task = self.db.execute("SELECT * FROM tasks WHERE id=?", (task_id,)).fetchone()
         if task is None:
             raise KeyError(task_id)
