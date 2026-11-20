@@ -11,6 +11,11 @@ class OrchestrationTests(unittest.TestCase):
         self.assertEqual(graph.ready_tasks(set()), ["build"])
         self.assertEqual(graph.ready_tasks({"build"}), ["test"])
 
+    def test_empty_task_identifier_rejected(self):
+        graph = TaskGraph()
+        with self.assertRaises(ValueError):
+            graph.add_task(" ")
+
     def test_cycle_rejected_without_corrupting_graph(self):
         graph = TaskGraph()
         graph.add_dependency("a", "b")
