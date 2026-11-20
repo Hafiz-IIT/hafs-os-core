@@ -119,6 +119,10 @@ The following changes were made after the initial 2026-11-18 inventory. All rema
 
 | A-38 | cargo-scan-consistency-lab | Extreme but finite positive measurements could overflow relative-ratio comparison; huge integer confidence, threshold and scenario parameters could escape validation | Added shared finite-float conversion with overflow handling and safe ratio calculation; regression tests cover extreme measurements and huge integers | [20 unit tests](https://github.com/Hafiz-IIT/cargo-scan-consistency-lab/actions/runs/44803487697) and [CI](https://github.com/Hafiz-IIT/cargo-scan-consistency-lab/actions/runs/44803487699) passed on 7b2b008 |
 
+### Additional rate-limit integrity follow-up (2026-11-21)
+
+| A-39 | resturant-order-management | Rate limiter evicted the oldest active client bucket when the key cap was reached, allowing address rotation to reset another client's attempt count | Expire stale keys first and reject new keys at capacity instead of evicting active buckets; invalid clock values fail closed | [17 Node tests](https://github.com/Hafiz-IIT/resturant-order-management/actions/runs/44803856569) passed on 8f9a601 |
+
 ### Portfolio-wide CI snapshot (2026-11-20)
 
 The latest GitHub Actions run for each of the 33 project repositories completed successfully on its current main, audit, research, or manuscript branch. This includes the application prototypes, simulation/control labs, three core governance/evidence repositories, and manuscript-integrity workflows. Two earlier failures (restaurant request-validation module resolution and Koopman operator overflow rejection) were followed by successful runs after the corresponding fixes. This is evidence that the configured checks pass at the recorded commits; it is not a substitute for a line-by-line security review, independent scientific replication, or deployment validation.
