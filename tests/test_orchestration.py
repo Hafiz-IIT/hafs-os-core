@@ -1,4 +1,5 @@
 import unittest
+from dataclasses import FrozenInstanceError
 
 from orchestration import ApprovalLedger, DependencyCycle, TaskGraph
 
@@ -16,6 +17,14 @@ class OrchestrationTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             graph.add_task(" ")
 
+    def test_dependency_snapshot_cannot_mutate_internal_graph(self):
+        graph = TaskGraph()
+        graph.add_dependency("deploy", "test")
+        snapshot = graph.dependencies
+        with self.assertRaises(AttributeError):
+            snapshot["deploy"].add("untrusted")
+        self.assertEqual(graph.dependencies["deploy"], frozenset({"test"}))
+
     def test_cycle_rejected_without_corrupting_graph(self):
         graph = TaskGraph()
         graph.add_dependency("a", "b")
@@ -27,7 +36,9 @@ class OrchestrationTests(unittest.TestCase):
 
     def test_designated_approver_required(self):
         ledger = ApprovalLedger()
-        ledger.request("t1", requested_by="agent-a", approver="human")
+        approval = ledger.request("t1", requested_by="agent-a", approver="human")
+        with self.assertRaises(FrozenInstanceError):
+            approval.approved = True
         with self.assertRaises(PermissionError):
             ledger.approve("t1", actor="agent-b")
         ledger.approve("t1", actor="human")
