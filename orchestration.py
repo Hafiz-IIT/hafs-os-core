@@ -19,11 +19,13 @@ class TaskGraph:
     def add_task(self, task_id: str) -> None:
         if not isinstance(task_id, str) or not task_id.strip():
             raise ValueError("task_id must be a non-empty string")
+        task_id = task_id.strip()
         self._dependencies.setdefault(task_id, set())
 
     def add_dependency(self, task_id: str, prerequisite_id: str) -> None:
         if any(not isinstance(value, str) or not value.strip() for value in (task_id, prerequisite_id)):
             raise ValueError("task identifiers must be non-empty strings")
+        task_id, prerequisite_id = task_id.strip(), prerequisite_id.strip()
         snapshot = {key: set(value) for key, value in self._dependencies.items()}
         try:
             self.add_task(task_id)
@@ -73,6 +75,7 @@ class ApprovalLedger:
     def request(self, task_id: str, *, requested_by: str, approver: str) -> Approval:
         if any(not isinstance(value, str) or not value.strip() for value in (task_id, requested_by, approver)):
             raise ValueError("task, requester and approver identifiers are required")
+        task_id, requested_by, approver = task_id.strip(), requested_by.strip(), approver.strip()
         if requested_by == approver:
             raise ValueError("requester and approver must be different actors")
         if task_id in self._approvals:
@@ -85,7 +88,9 @@ class ApprovalLedger:
         approval = self._approvals.get(task_id)
         if approval is None:
             raise KeyError(task_id)
-        if actor != approval.approver:
+        if not isinstance(actor, str) or not actor.strip():
+            raise ValueError("actor identity is required")
+        if actor.strip() != approval.approver:
             raise PermissionError("actor is not the designated approver")
         if approval.approved:
             raise ValueError("approval has already been granted")
