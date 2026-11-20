@@ -123,6 +123,10 @@ The following changes were made after the initial 2026-11-18 inventory. All rema
 
 | A-39 | resturant-order-management | Rate limiter evicted the oldest active client bucket when the key cap was reached, allowing address rotation to reset another client's attempt count | Expire stale keys first and reject new keys at capacity instead of evicting active buckets; invalid clock values fail closed | [17 Node tests](https://github.com/Hafiz-IIT/resturant-order-management/actions/runs/44803856569) passed on 8f9a601 |
 
+### Additional thermal numerical-method follow-up (2026-11-21)
+
+| A-40 | cold-chain-digital-twin | Threshold interpolation could overflow for opposite-sign extreme temperatures; six-decimal rounding erased short excursions; explicit-Euler step allowed thermal_rate × dt > 1 and non-monotone overshoot | Scale crossing inputs before interpolation, preserve full excursion precision, enforce monotone explicit-Euler step bound, and reject oversized numeric values | [14 unit tests](https://github.com/Hafiz-IIT/cold-chain-digital-twin/actions/runs/44804480082) and [CI](https://github.com/Hafiz-IIT/cold-chain-digital-twin/actions/runs/44804480150) passed on 4a5733c |
+
 ### Portfolio-wide CI snapshot (2026-11-20)
 
 The latest GitHub Actions run for each of the 33 project repositories completed successfully on its current main, audit, research, or manuscript branch. This includes the application prototypes, simulation/control labs, three core governance/evidence repositories, and manuscript-integrity workflows. Two earlier failures (restaurant request-validation module resolution and Koopman operator overflow rejection) were followed by successful runs after the corresponding fixes. This is evidence that the configured checks pass at the recorded commits; it is not a substitute for a line-by-line security review, independent scientific replication, or deployment validation.
