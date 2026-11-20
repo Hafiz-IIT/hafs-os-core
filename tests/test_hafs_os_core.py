@@ -1,3 +1,5 @@
+import sqlite3
+import tempfile
 import unittest
 
 from hafs_os_core import Decision, HafsOSCore
@@ -97,6 +99,36 @@ class HafsOSCoreTests(unittest.TestCase):
         task = core.create_task("x", "medium", "write", 1)
         self.assertEqual(core.decide(task, "agent"), Decision.VERIFY)
         self.assertEqual(core.task_status(task), "awaiting_evidence")
+
+    def test_existing_database_migrates_legacy_tasks_status_column(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = f"{directory}/legacy.sqlite3"
+            db = sqlite3.connect(path)
+            db.executescript("""
+                CREATE TABLE tasks (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT, description TEXT NOT NULL,
+                    risk TEXT NOT NULL, required_permission TEXT NOT NULL,
+                    evidence_required INTEGER NOT NULL
+                );
+                CREATE TABLE permissions (agent TEXT NOT NULL, permission TEXT NOT NULL, PRIMARY KEY(agent, permission));
+                CREATE TABLE evidence (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT, task_id INTEGER NOT NULL,
+                    source TEXT NOT NULL, claim TEXT NOT NULL, verified INTEGER NOT NULL DEFAULT 0
+                );
+                CREATE TABLE audit (id INTEGER PRIMARY KEY AUTOINCREMENT, task_id INTEGER, event TEXT NOT NULL, at REAL NOT NULL);
+                INSERT INTO tasks(description, risk, required_permission, evidence_required)
+                VALUES ('legacy task', 'low', 'write', 0);
+            """)
+            db.commit()
+            db.close()
+            core = HafsOSCore(path)
+            try:
+                self.assertEqual(core.task_status(1), "pending")
+                core.grant("agent", "write")
+                self.assertEqual(core.decide(1, "agent"), Decision.ACT)
+                self.assertEqual(core.task_status(1), "authorized")
+            finally:
+                core.close()
 
     def test_critical_always_escalates(self):
         core = HafsOSCore()
